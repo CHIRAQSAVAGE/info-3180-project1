@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <h2>Successful Form Submission</h2>
+    {% include 'flash_messages.html' %}
+    <p> Thank you for creating a profile <strong>{{ firstname + ' ' + lastname }}</strong>. We have stored your info and will contact you at the email address <strong>{{ email }}</strong>!
+    </p>
+{% endblock %}

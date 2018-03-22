@@ -5,17 +5,70 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
 
+import os
+from app import app
+
+
 from app import app, db, login_manager
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
-from forms import LoginForm
-from models import UserProfile
+from forms import ProfileForm, PhotoForm
+from werkzeug.utils import secure_filename
+
 from werkzeug.security import check_password_hash
 
+
 ###
-# Routing for your application.
+# Project 1 routes start here
 ###
 
+@app.route('/profile',methods=['GET', 'POST'])
+def profile():
+    "Render user's profile page."
+    if request.method == 'POST':
+        firstname = request.form['firstname']
+        lastname = request.form['lastname']
+        email = request.form['email']
+        location = request.form['location']
+        gender = request.form['gender']
+        password = request.form['password']
+        
+    return render_template('profile.html',)
+
+@app.route('/profiles')
+def profiles():
+    "Render list of profiles."
+
+    return render_template('profiles.html')
+    
+@app.route('/profile/<userid>')
+def findprofile():
+    "Render specific profile based on specific user id"
+    return render_template('profiles.html', userid="620089313")
+
+@app.route('/photo-upload', methods=['GET', 'POST'])
+def photo_upload():
+    
+    photoform = PhotoForm()
+
+    if request.method == 'POST' and photoform.validate_on_submit():
+
+        photo = photoform.photo.data 
+        description = photoform.description.data
+
+        filename = secure_filename(photo.filename)
+        photo.save(os.path.join(
+            app.config['UPLOAD_FOLDER'], filename
+        ))
+
+        return render_template('display_photo.html', filename=filename, description=description)
+
+    flash_errors(photoform)
+    return render_template('photo_upload.html', form=photoform)
+
+###
+# Routes specified in the project end here
+###
 
 @app.route('/')
 def home():
